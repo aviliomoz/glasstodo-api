@@ -1,119 +1,134 @@
 const { request, response } = require('express');
 const Task = require('../models/taskModel');
 
-const getTasks = async (req = request, res = response) => {
-  try {
-    const tasks = await Task.find();
+const getTasks = (req = request, res = response) => {
+  Task.find({}, (err, tasksDB) => {
+    if (err) {
+      return res.status(500).json({
+        ok: false,
+        msg: 'Error en el servidor',
+        err,
+      });
+    }
+
+    if (!tasksDB) {
+      return res.status(404).json({
+        ok: false,
+        msg: 'No se encontro ninguna tarea',
+      });
+    }
 
     return res.status(200).json({
       ok: true,
-      tasks,
+      tasks: tasksDB,
     });
-  } catch (error) {
-    console.log('Error en el servidor', error);
-    return res.status(500).json({
-      ok: false,
-      msg: 'Error en el servidor',
-      error,
-    });
-  }
+  });
 };
 
-const createTask = async (req = request, res = response) => {
-  try {
-    const { title } = req.body.task;
-    const task = new Task({
-      title,
-    });
+const createTask = (req = request, res = response) => {
+  const { title, completed = false } = req.body.task;
+  const task = new Task({
+    title,
+    completed,
+  });
 
-    const savedTask = await task.save();
-
-    if (savedTask) {
-      return res.status(200).json({
-        ok: true,
-        msg: 'Tarea guardada corectamente',
-        task: savedTask,
+  task.save({}, (err, taskDB) => {
+    if (err) {
+      return res.status(500).json({
+        ok: false,
+        msg: 'Error en el servidor',
+        err,
       });
-    } else {
-      return res.status(400).json({
+    }
+
+    if (!taskDB) {
+      return res.status(404).json({
         ok: false,
         msg: 'No se pudo guardar la tarea',
       });
     }
-  } catch (error) {
-    console.log('Error en el servidor', error);
-    return res.status(500).json({
-      ok: false,
-      msg: 'Error en el servidor',
-      error,
+
+    return res.status(200).json({
+      ok: true,
+      msg: 'Tarea guardada correctamente',
+      task: taskDB,
     });
-  }
+  });
 };
 
-const updateTask = async (req = request, res = response) => {
-  try {
-    const id = req.params.id;
-    const { title, completed } = req.body.task;
+const updateTask = (req = request, res = response) => {
+  const id = req.params.id;
+  const { title, completed } = req.body.task;
 
-    await Task.findByIdAndUpdate(
-      id,
-      { title, completed },
-      { new: true },
-      (error, updatedTask) => {
-        if (error) {
-          res.status(400).json({
-            ok: false,
-            msg: 'No se pudo actualizar la tarea',
-          });
-        }
+  Task.findById(id, {}, {}, (err, taskDB) => {
+    if (err) {
+      return res.status(500).json({
+        ok: false,
+        msg: 'Error en el servidor',
+        err,
+      });
+    }
 
-        if (updatedTask) {
-          res.status(200).json({
-            ok: true,
-            msg: 'Tarea actualizada exitosamente',
-            task: updatedTask,
-          });
-        }
-      },
-    );
-  } catch (error) {
-    console.log('Error en el servidor', error);
-    return res.status(500).json({
-      ok: false,
-      msg: 'Error en el servidor',
-      error,
-    });
-  }
-};
+    if (!taskDB) {
+      return res.status(404).json({
+        ok: false,
+        msg: 'No se pudo encontrar la tarea',
+      });
+    }
 
-const deleteTask = async (req = request, res = response) => {
-  try {
-    const id = req.params.id;
+    taskDB.title = title;
+    taskDB.completed = completed;
 
-    await Task.findByIdAndDelete(id, (error, deletedTask) => {
-      if (error) {
-        res.status(400).json({
+    taskDB.save({}, (err, updatedTask) => {
+      if (err) {
+        return res.status(500).json({
           ok: false,
-          msg: 'No se pudo eliminar la tarea',
+          msg: 'Error en el servidor',
+          err,
         });
       }
 
-      if (deletedTask) {
-        res.status(200).json({
-          ok: true,
-          msg: 'Tarea eliminada exitosamente',
-          task: deletedTask,
+      if (!updatedTask) {
+        return res.status(404).json({
+          ok: false,
+          msg: 'No se pudo actualizar la tarea',
         });
       }
+
+      return res.status(200).json({
+        ok: true,
+        msg: 'Tarea actualizada exitosamente',
+        task: updatedTask,
+      });
     });
-  } catch (error) {
-    console.log('Error en el servidor', error);
-    return res.status(500).json({
-      ok: false,
-      msg: 'Error en el servidor',
-      error,
+  });
+};
+
+const deleteTask = (req = request, res = response) => {
+  const id = req.params.id;
+
+  Task.findByIdAndDelete(id, {}, (err, taskDB) => {
+    if (err) {
+      return res.status(500).json({
+        ok: false,
+        msg: 'Error en el servidor',
+        err,
+      });
+    }
+
+    if (!taskDB) {
+      return res.status(404).json({
+        ok: false,
+        msg: 'No se encontro la tarea',
+      });
+    }
+
+    return res.status(200).json({
+      ok: true,
+      msg: 'Tarea eliminada exitosamente',
+      task: taskDB,
     });
-  }
+  });
 };
 
 module.exports = {
