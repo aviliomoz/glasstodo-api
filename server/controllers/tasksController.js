@@ -53,12 +53,12 @@ const createTask = async (req = request, res = response) => {
 const updateTask = async (req = request, res = response) => {
   try {
     const id = req.params.id;
-    const { title } = req.body.task;
+    const { title, completed } = req.body.task;
 
     await Task.findByIdAndUpdate(
       id,
-      { title },
-      { new: true, useFindAndModify: true },
+      { title, completed },
+      { new: true },
       (error, updatedTask) => {
         if (error) {
           res.status(400).json({
