@@ -1,12 +1,13 @@
 const router = require('express').Router();
 const tasksController = require('../controllers/tasksController');
+const { verifyJWT } = require('../middlewares/authMiddleware');
 
-router.get('/', tasksController.getTasks);
+router.get('/', verifyJWT, tasksController.getTasks);
 
-router.post('/', tasksController.createTask);
+router.post('/', verifyJWT, tasksController.createTask);
 
-router.put('/:id', tasksController.updateTask);
+router.put('/:id', verifyJWT, tasksController.updateTask);
 
-router.delete('/:id', tasksController.deleteTask);
+router.delete('/:id', verifyJWT, tasksController.deleteTask);
 
 module.exports = router;
