@@ -14,10 +14,6 @@ app.use(express.static('public'));
 
 app.use('/api', api);
 
-app.listen(process.env.PORT, () => {
-  console.log(`Server runnig on port ${process.env.PORT}`);
-});
-
 mongoose.connect(
   process.env.DB_URL,
   {
@@ -26,7 +22,10 @@ mongoose.connect(
     useUnifiedTopology: true,
   },
   (err) => {
-    if (err) throw new mongoose.Error(err);
-    console.log('Database ready');
+    if (err) throw mongoose.Error(err);
+    app.listen(process.env.PORT, () => {
+      console.log(`Server runnig on port ${process.env.PORT}`);
+      console.log('Database ready');
+    });
   },
 );

@@ -1,7 +1,7 @@
 const { request, response } = require('express');
 const Task = require('../models/taskModel');
 
-const getTasks = (req = request, res = response) => {
+module.exports.getTasks = (req = request, res = response) => {
   Task.find({}, (err, tasksDB) => {
     if (err) {
       return res.status(500).json({
@@ -25,40 +25,42 @@ const getTasks = (req = request, res = response) => {
   });
 };
 
-const createTask = (req = request, res = response) => {
-  const { title, completed = false } = req.body.task;
-  const task = new Task({
-    title,
-    completed,
-  });
+module.exports.createTask = (req = request, res = response) => {
+  const { title, completed = false } = req.body;
 
-  task.save({}, (err, taskDB) => {
-    if (err) {
-      return res.status(500).json({
-        ok: false,
-        msg: 'Error en el servidor',
-        err,
+  Task.create(
+    {
+      title,
+      completed,
+    },
+    (err, taskDB) => {
+      if (err) {
+        return res.status(500).json({
+          ok: false,
+          msg: 'Error en el servidor',
+          err,
+        });
+      }
+
+      if (!taskDB) {
+        return res.status(404).json({
+          ok: false,
+          msg: 'No se pudo guardar la tarea',
+        });
+      }
+
+      return res.status(200).json({
+        ok: true,
+        msg: 'Tarea guardada correctamente',
+        task: taskDB,
       });
-    }
-
-    if (!taskDB) {
-      return res.status(404).json({
-        ok: false,
-        msg: 'No se pudo guardar la tarea',
-      });
-    }
-
-    return res.status(200).json({
-      ok: true,
-      msg: 'Tarea guardada correctamente',
-      task: taskDB,
-    });
-  });
+    },
+  );
 };
 
-const updateTask = (req = request, res = response) => {
+module.exports.updateTask = (req = request, res = response) => {
   const id = req.params.id;
-  const { title, completed } = req.body.task;
+  const { title, completed } = req.body;
 
   Task.findById(id, {}, {}, (err, taskDB) => {
     if (err) {
@@ -104,7 +106,7 @@ const updateTask = (req = request, res = response) => {
   });
 };
 
-const deleteTask = (req = request, res = response) => {
+module.exports.deleteTask = (req = request, res = response) => {
   const id = req.params.id;
 
   Task.findByIdAndDelete(id, {}, (err, taskDB) => {
@@ -129,11 +131,4 @@ const deleteTask = (req = request, res = response) => {
       task: taskDB,
     });
   });
-};
-
-module.exports = {
-  getTasks,
-  createTask,
-  updateTask,
-  deleteTask,
 };
