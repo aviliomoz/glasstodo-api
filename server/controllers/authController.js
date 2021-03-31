@@ -15,17 +15,12 @@ module.exports.signin = async (req = request, res = response) => {
     const user = await User.create({ name, lastname, email, password });
 
     const token = createJWT(user._id);
-    res.cookie('jwt', token, {
-      maxAge: 60 * 60 * 24 * 3 * 1000,
-      httpOnly: true,
-    });
-
-    res.locals.uid = user._id;
 
     return res.status(200).json({
       ok: true,
       msg: 'Usuario registrado exitosamente',
       uid: user._id,
+      token,
     });
   } catch (error) {
     return res.status(400).json({
@@ -43,17 +38,12 @@ module.exports.login = async (req = request, res = response) => {
     const user = await User.login(email, password);
 
     const token = createJWT(user._id);
-    res.cookie('jwt', token, {
-      maxAge: 60 * 60 * 24 * 3 * 1000,
-      httpOnly: true,
-    });
-
-    res.locals.uid = user._id;
 
     return res.status(200).json({
       ok: true,
       msg: 'Inicio de sesión exitoso',
       uid: user._id,
+      token,
     });
   } catch (error) {
     return res.status(400).json({
@@ -65,19 +55,16 @@ module.exports.login = async (req = request, res = response) => {
 };
 
 module.exports.renew = async (req = request, res = response) => {
-  const { uid } = res.locals;
+  const { uid } = req.body;
 
   try {
     const token = createJWT(uid);
-    res.cookie('jwt', token, {
-      maxAge: 60 * 60 * 24 * 3 * 1000,
-      httpOnly: true,
-    });
 
     return res.status(200).json({
       ok: true,
       msg: 'Token renovado exitosamente',
       uid,
+      token,
     });
   } catch (error) {
     return res.status(400).json({
@@ -88,11 +75,21 @@ module.exports.renew = async (req = request, res = response) => {
   }
 };
 
-module.exports.logout = (req = request, res = response) => {
-  res.cookie('jwt', '', { maxAge: 1 });
-  return res.status(200).json({
-    ok: true,
-    msg: 'Sesión cerrada',
-    uid: res.locals.uid,
-  });
+module.exports.getUserNameById = async (req = request, res = response) => {
+  const uid = req.params.id;
+
+  try {
+    const user = await User.findById(uid);
+    return res.status(200).json({
+      ok: true,
+      msg: 'Nombre de usuario',
+      user: user.name,
+    });
+  } catch (error) {
+    return res.status(400).json({
+      ok: false,
+      msg: 'No se encontró el usuario',
+      error: error.message,
+    });
+  }
 };

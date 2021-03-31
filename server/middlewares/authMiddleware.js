@@ -2,7 +2,7 @@ const { request, response } = require('express');
 const jwt = require('jsonwebtoken');
 
 module.exports.verifyJWT = (req = request, res = response, next) => {
-  const token = req.cookies.jwt;
+  const token = req.header('x-token');
 
   if (!token) {
     return res.status(401).json({
@@ -11,7 +11,7 @@ module.exports.verifyJWT = (req = request, res = response, next) => {
     });
   }
 
-  jwt.verify(token, process.env.SECRET, (err, decodedToken) => {
+  jwt.verify(token, process.env.SECRET, (err) => {
     if (err) {
       return res.status(401).json({
         ok: false,
@@ -19,7 +19,6 @@ module.exports.verifyJWT = (req = request, res = response, next) => {
       });
     }
 
-    res.locals.uid = decodedToken.id;
     next();
   });
 };
