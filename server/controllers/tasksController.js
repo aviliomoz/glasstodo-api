@@ -2,7 +2,9 @@ const { request, response } = require('express');
 const Task = require('../models/taskModel');
 
 module.exports.getTasks = (req = request, res = response) => {
-  Task.find({}, (err, tasksDB) => {
+  const uid = req.params.uid;
+
+  Task.find({ user: uid }, (err, tasksDB) => {
     if (err) {
       return res.status(500).json({
         ok: false,

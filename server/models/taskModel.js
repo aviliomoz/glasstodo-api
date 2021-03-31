@@ -10,10 +10,11 @@ const taskSchema = new Schema({
     required: true,
     default: false,
   },
-  // user: {
-  //   type: Schema.Types.ObjectId,
-  //   required: true,
-  // },
+  user: {
+    type: Schema.Types.ObjectId,
+    required: true,
+    ref: 'User',
+  },
 });
 
 const Task = model('task', taskSchema);

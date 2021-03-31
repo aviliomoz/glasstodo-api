@@ -20,6 +20,7 @@ module.exports.signin = async (req = request, res = response) => {
       ok: true,
       msg: 'Usuario registrado exitosamente',
       uid: user._id,
+      username: user.name,
       token,
     });
   } catch (error) {
@@ -43,6 +44,7 @@ module.exports.login = async (req = request, res = response) => {
       ok: true,
       msg: 'Inicio de sesión exitoso',
       uid: user._id,
+      username: user.name,
       token,
     });
   } catch (error) {
@@ -58,37 +60,21 @@ module.exports.renew = async (req = request, res = response) => {
   const { uid } = req.body;
 
   try {
+    const user = await User.findById(uid);
+
     const token = createJWT(uid);
 
     return res.status(200).json({
       ok: true,
       msg: 'Token renovado exitosamente',
       uid,
+      username: user.name,
       token,
     });
   } catch (error) {
     return res.status(400).json({
       ok: false,
       msg: 'No se pudo renovar el token',
-      error: error.message,
-    });
-  }
-};
-
-module.exports.getUserNameById = async (req = request, res = response) => {
-  const uid = req.params.id;
-
-  try {
-    const user = await User.findById(uid);
-    return res.status(200).json({
-      ok: true,
-      msg: 'Nombre de usuario',
-      user: user.name,
-    });
-  } catch (error) {
-    return res.status(400).json({
-      ok: false,
-      msg: 'No se encontró el usuario',
       error: error.message,
     });
   }
