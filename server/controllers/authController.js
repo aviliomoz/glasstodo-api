@@ -57,7 +57,7 @@ module.exports.login = async (req = request, res = response) => {
 };
 
 module.exports.renew = async (req = request, res = response) => {
-  const { uid } = req.body;
+  const uid = req.params.uid;
 
   try {
     const user = await User.findById(uid);
