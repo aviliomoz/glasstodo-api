@@ -28,12 +28,13 @@ module.exports.getTasks = (req = request, res = response) => {
 };
 
 module.exports.createTask = (req = request, res = response) => {
-  const { title, completed = false } = req.body;
+  const { title, completed = false, user } = req.body;
 
   Task.create(
     {
       title,
       completed,
+      user,
     },
     (err, taskDB) => {
       if (err) {
