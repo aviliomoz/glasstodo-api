@@ -67,7 +67,7 @@ module.exports.renew = async (req = request, res = response) => {
     return res.status(200).json({
       ok: true,
       msg: 'Token renovado exitosamente',
-      uid,
+      uid: user._id,
       username: user.name,
       token,
     });
