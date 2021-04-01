@@ -61,8 +61,8 @@ module.exports.renew = async (req = request, res = response) => {
 
   try {
     const user = await User.findById(uid);
-
-    const token = createJWT(uid);
+    console.log(user);
+    const token = createJWT(user._id);
 
     return res.status(200).json({
       ok: true,
