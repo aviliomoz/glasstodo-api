@@ -11,13 +11,15 @@ module.exports.verifyJWT = (req = request, res = response, next) => {
     });
   }
 
-  jwt.verify(token, process.env.SECRET, (err) => {
+  jwt.verify(token, process.env.SECRET, (err, decodedPayload) => {
     if (err) {
       return res.status(401).json({
         ok: false,
         msg: 'Token inválido',
       });
     }
+
+    req.uid = decodedPayload.uid;
 
     next();
   });

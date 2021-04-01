@@ -2,8 +2,8 @@ const { request, response } = require('express');
 const User = require('../models/userModel');
 const jwt = require('jsonwebtoken');
 
-const createJWT = (id) => {
-  return jwt.sign({ id }, process.env.SECRET, {
+const createJWT = (uid) => {
+  return jwt.sign({ uid }, process.env.SECRET, {
     expiresIn: 60 * 60 * 24 * 3,
   });
 };
@@ -57,11 +57,12 @@ module.exports.login = async (req = request, res = response) => {
 };
 
 module.exports.renew = async (req = request, res = response) => {
-  const uid = req.params.uid;
+  const { uid } = req;
+  console.log(uid);
 
   try {
     const user = await User.findById(uid);
-    console.log(user);
+
     const token = createJWT(user._id);
 
     return res.status(200).json({
