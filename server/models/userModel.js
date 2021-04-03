@@ -39,10 +39,10 @@ userSchema.statics.login = async function (email, password) {
     if (auth) {
       return user;
     } else {
-      throw Error('Credenciales inválidas - password');
+      throw Error('El email o la contraseña es incorrecta');
     }
   } else {
-    throw Error('Credenciales inválidas - email');
+    throw Error('El email ingresado no esta registrado.');
   }
 };
 
