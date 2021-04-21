@@ -28,13 +28,16 @@ module.exports.getTasks = (req = request, res = response) => {
 };
 
 module.exports.createTask = (req = request, res = response) => {
-  const { title, completed = false, user } = req.body;
+  const { title, completed = false, user, description, date, time } = req.body;
 
   Task.create(
     {
       title,
       completed,
       user,
+      description,
+      date,
+      time,
     },
     (err, taskDB) => {
       if (err) {
@@ -63,7 +66,7 @@ module.exports.createTask = (req = request, res = response) => {
 
 module.exports.updateTask = (req = request, res = response) => {
   const id = req.params.id;
-  const { title, completed } = req.body;
+  const { title, completed, description } = req.body;
 
   Task.findById(id, {}, {}, (err, taskDB) => {
     if (err) {
@@ -83,6 +86,7 @@ module.exports.updateTask = (req = request, res = response) => {
 
     taskDB.title = title;
     taskDB.completed = completed;
+    taskDB.description = description;
 
     taskDB.save({}, (err, updatedTask) => {
       if (err) {
