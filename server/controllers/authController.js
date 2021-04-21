@@ -9,10 +9,10 @@ const createJWT = (uid) => {
 };
 
 module.exports.signin = async (req = request, res = response) => {
-  const { name, lastname, email, password } = req.body;
+  const { name, email, password } = req.body;
 
   try {
-    const user = await User.create({ name, lastname, email, password });
+    const user = await User.create({ name, email, password });
 
     const token = createJWT(user._id);
 
