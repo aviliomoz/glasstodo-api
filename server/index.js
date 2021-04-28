@@ -1,18 +1,6 @@
-const api = require('./api');
-
 require('dotenv').config();
-const express = require('express');
 const mongoose = require('mongoose');
-const cors = require('cors');
-
-const app = express();
-
-app.use(cors());
-app.use(express.urlencoded({ extended: false }));
-app.use(express.json());
-app.use(express.static('public'));
-
-app.use('/api', api);
+const app = require('./config/app');
 
 mongoose.connect(
   process.env.DB_URL,

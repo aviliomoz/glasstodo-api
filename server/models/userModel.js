@@ -1,23 +1,19 @@
 const { Schema, model } = require('mongoose');
-const { isEmail } = require('validator').default;
 const bcrypt = require('bcrypt');
 
 const userSchema = new Schema({
   name: {
     type: String,
-    required: [true, 'El nombre es obligatorio'],
+    required: true,
   },
   email: {
     type: String,
-    required: [true, 'El email es obligatorio'],
+    required: true,
     unique: true,
-    lowercase: true,
-    validate: [isEmail, 'Por favor ingresa un email válido'],
   },
   password: {
     type: String,
-    required: [true, 'La contraseña es obligatoria'],
-    minlength: [6, 'Debe contener al menos 6 caracteres'],
+    required: true,
   },
 });
 
